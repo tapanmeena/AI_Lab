@@ -17,96 +17,105 @@ def MoveGen(mat,start):
 def bestfs(mat,cordinatesList,curr,dest):
 	print "Best First Search Start:"
 	final = dest
-	visited = [False] * len(mat)
-	parentList = [-1] * len(mat)
+	visited = [False] * len(mat)	#visited list
+	parentList = [-1] * len(mat)	#contains child's parent
 	qList = []
-	qList.append(curr)
-	found = False
-	pathFollowed=[]
+	qList.append(curr)				#list contains element to iterate through
+	found = False					#True if destination is found
+	NodesSearched=[]				#path followed during traversing
 	PQ = PriorityQueue()
-	distance = math.sqrt(pow((cordinatesList[curr][0]-cordinatesList[dest][0]),2)+pow((cordinatesList[curr][1]-cordinatesList[dest][1]),2))
-	PQ.put((distance,curr))
+	temp = heuristic(mat,curr,dest)		
+	PQ.put((temp[0],curr))      	#contains (distance, node)
 	while not PQ.empty():
-		top = PQ.get()
+		top = PQ.get()				#Node to search
 #		print "Node Searching is",top[1]+1
 		qList.remove(top[1])
-		if (top[1]+1) not in pathFollowed:
-			pathFollowed.append(top[1]+1)
-		visited[top[1]] = True
-		neighbours = MoveGen(mat,top[1])
-		for i in range(len(neighbours)):
+
+		if (top[1]+1) not in NodesSearched:
+			NodesSearched.append(top[1]+1)
+		visited[top[1]] = True		#mark node as visited
+
+		neighbours = MoveGen(mat,top[1])			#Ask neighbours from MoveGen Function
+
+		for i in range(len(neighbours)):			#iterate through all neighbours
 			if(visited[neighbours[i]]):
 				continue
 			else:
 				if neighbours[i] not in qList:
-					PQ.put(heuristic1(mat,neighbours[i],dest))
+					PQ.put(heuristic(mat,neighbours[i],dest))   #adding element in Priority Queue(heuristic,node)
 					qList.append(neighbours[i])
 				parentList[neighbours[i]] = top[1]
-				if(GoalTest(neighbours[i],dest)):
+				if(GoalTest(neighbours[i],dest)):				#check GoalTest
 					visited[neighbours[i]] = True
 					found = True
 					break
-		if(found):
+		if(found):			#if destination found
 			break
 	if(not visited[dest]):
 			print "Path not Found"
 			exit(0)
 
 	path = []
-	while(True):
+	while(True):					#iterate through parentlist to found path followed
 		dest = parentList[dest]
 		path.append(dest+1)
 		if(dest == curr):
 			break
 
 	fullPath=""
-	for i in range(len(path)):
+	for i in range(len(path)):			#creating path
 		fullPath = fullPath+str(path[len(path)-i-1]) +" -> "
 	print "Best First Search:",fullPath,final+1
-	print "Nodes searched in Best First Search",pathFollowed
+	print "Nodes searched in Best First Search",NodesSearched
 
 def hillclimb(mat,cordinatesList,curr,dest):
 	print "Hill Climbing Start:"
 	final = dest
-	visited = [False] * len(mat)
-	parentList = [-1] * len(mat)
+	visited = [False] * len(mat)	#visited list
+	parentList = [-1] * len(mat)	#contains child's parent
 	qList = []
-	qList.append(curr)
-	found = False
-	pathFollowed=[]
-	PQ = PriorityQueue()
-	distance = math.sqrt(pow((cordinatesList[curr][0]-cordinatesList[dest][0]),2)+pow((cordinatesList[curr][1]-cordinatesList[dest][1]),2))
-	best = distance
-	PQ.put((distance,curr))
+	qList.append(curr)				#list contains element to iterate through
+	found = False					#True if destination is found
+	NodesSearched=[]				#path followed during traversing
+	PQ = PriorityQueue()			
+	temp = heuristic(mat,curr,dest)
+	PQ.put((temp[0],curr))
+	distance = temp[0]
 	l=1
 	while not PQ.empty():
 		if l!=1:
-			ls = heuristic1(mat,top[1],dest)
-			distance = ls[0]
+			temp = heuristic(mat,top[1],dest)
+			distance = temp[0]
 		l = l+1
-		top = PQ.get()
-		checkDistance = heuristic1(mat,top[1],dest)
-		if(checkDistance[0]>distance):
+		top = PQ.get()							#Node to search
+		checkDistance = heuristic(mat,top[1],dest) #check its distance from destination
+
+		if(checkDistance[0]>distance):			#check if current distance is best or not
 			break
-		while not PQ.empty():
+
+		while not PQ.empty():					#clearing Priority Queue
 			PQ.get()
+
 		print "Node Searching is",top[1]+1
 		qList.remove(top[1])
-		while qList:
+
+		while qList:							#clearing main list
 			qList.pop()
-		if (top[1]+1) not in pathFollowed:
-			pathFollowed.append(top[1]+1)
-		visited[top[1]] = True
-		neighbours = MoveGen(mat,top[1])
-		for i in range(len(neighbours)):
+
+		if (top[1]+1) not in NodesSearched:
+			NodesSearched.append(top[1]+1)		#adding current Station to nodes Searched
+		visited[top[1]] = True					#marking it visited
+		neighbours = MoveGen(mat,top[1])		#asking neighbours from movegen
+
+		for i in range(len(neighbours)):		#iterate through neighbours
 			if(visited[neighbours[i]]):
 				continue
 			else:
 				if neighbours[i] not in qList:
-					PQ.put(heuristic1(mat,neighbours[i],dest))
+					PQ.put(heuristic(mat,neighbours[i],dest))	#calculating heuristic vallue
 					qList.append(neighbours[i])
-				parentList[neighbours[i]] = top[1]
-				if(GoalTest(neighbours[i],dest)):
+				parentList[neighbours[i]] = top[1]				
+				if(GoalTest(neighbours[i],dest)):				#checking GoalTest
 					visited[neighbours[i]] = True
 					found = True
 					break
@@ -117,21 +126,23 @@ def hillclimb(mat,cordinatesList,curr,dest):
 			exit(0)
 
 	path = []
-	while(True):
+	while(True):				#iterate through parentlist to found path followed
 		dest = parentList[dest]
 		path.append(dest+1)
 		if(dest == curr):
 			break
 
 	fullPath=""
-	for i in range(len(path)):
+	for i in range(len(path)):    	#creating path
 		fullPath = fullPath+str(path[len(path)-i-1]) +" -> "
 	print "Hill Climbing:",fullPath,final+1
-	print "Nodes searched in Hill Climb",pathFollowed
+	print "Nodes searched in Hill Climb",NodesSearched
 
-def heuristic1(mat,i,dest):
+def heuristic(mat,i,dest): #calculate Eucleadin Distance between given and Destination cordinates
 	distance = math.sqrt(pow((cordinatesList[i][0]-cordinatesList[dest][0]),2)+pow((cordinatesList[i][1]-cordinatesList[dest][1]),2))
 	return (distance,i)
+
+
 
 
 nodes = int(input("Number of Nodes "))
@@ -165,8 +176,9 @@ if(curr == dest):
 	exit()
 
 bestfs(mat,cordinatesList,curr,dest)
-print "\n\n"
+print "\n"
 hillclimb(mat,cordinatesList,curr,dest)
+
 
 # example given in PDF file
 
